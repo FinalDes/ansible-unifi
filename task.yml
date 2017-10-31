@@ -1,0 +1,30 @@
+---
+  - hosts: unifi
+    become: true
+    tasks:
+    - name: update lastest packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+    - name: add ubiquiti key
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: 06E85760C0A52C50
+    - name: add ubiquiti repo
+      apt_repository:
+        repo: 'deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti'
+        state: present
+        filename: 'ubnt'
+        update_cache: yes
+    - name: install unifi
+      apt:
+        name: unifi
+        state: present
+    - name: check mongodb
+      wait_for:
+        port: 27017
+        delay: 1
+    - name: check unifi
+      wait_for:
+        port: 8443
+        delay: 1
